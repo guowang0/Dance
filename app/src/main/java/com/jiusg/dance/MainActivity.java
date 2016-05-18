@@ -1,5 +1,6 @@
 package com.jiusg.dance;
 
+import android.graphics.Color;
 import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,11 +34,14 @@ public class MainActivity extends AppCompatActivity {
     private ImageView oldBoyView;
     private TextView button;
     private TextView click;
+    private TextView scoreView;
     private LinearLayout pass;
+    private LinearLayout layoutLive;
     private TextView levelView;
     private TextView liveView;
 
     private ArrayList<ImageView> listPass = new ArrayList<>();
+    private ArrayList<ImageView> listLive = new ArrayList<>();
 
     // 相对于原图片的放大倍数
     private float multipleX = 0;
@@ -53,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private MainHandler handler;
 
     public int gameStatus = 0;
+    public int score = 0;
     public int level = 0;
     public int live = 3;
     public int actionNum = 1;
@@ -117,8 +122,10 @@ public class MainActivity extends AppCompatActivity {
         button = (TextView) findViewById(R.id.button);
         click = (TextView) findViewById(R.id.click);
         pass = (LinearLayout) findViewById(R.id.pass);
+        layoutLive = (LinearLayout) findViewById(R.id.live_linear);
         levelView = (TextView) findViewById(R.id.level);
         liveView = (TextView) findViewById(R.id.live);
+        scoreView = (TextView) findViewById(R.id.score);
 
         click.setVisibility(View.GONE);
 
@@ -132,8 +139,11 @@ public class MainActivity extends AppCompatActivity {
                         actionNum = 1;
                         live = 3;
                         level = 0;
+                        score = 0;
                         levelView.setText("第1关");
                         liveView.setText(" "+live+" ");
+                        scoreView.setText("得分："+score);
+                        initLive(live);
                         button.setClickable(false);
                         button.setText("READY");
                         handler.sendEmptyMessageDelayed(1, 1000);
@@ -245,12 +255,15 @@ public class MainActivity extends AppCompatActivity {
             return;
 
         if (isPass == 1) {
-            listPass.get(i).setImageResource(R.drawable.pass);
+            listPass.get(i).setImageResource(R.mipmap.pass);
+            score++;
+            scoreView.setText("得分："+score);
         } else if (isPass == 2) {
-            listPass.get(i).setImageResource(R.drawable.notpass);
+            listPass.get(i).setImageResource(R.mipmap.notpass);
             live--;
             liveView.setText(" "+live+" ");
-            if (live == 0) {
+            initLive(live);
+            if (live <= 0) {
                 gameStatus = STOP;
                 button.setText("游戏结束");
                 button.setVisibility(View.VISIBLE);
@@ -265,11 +278,28 @@ public class MainActivity extends AppCompatActivity {
         listPass.clear();
         for (int i = 0; i < num; i++) {
             ImageView imageView = new ImageView(this);
-            imageView.setImageResource(R.drawable.passbg);
+            imageView.setImageResource(R.mipmap.passbg);
+            imageView.setMinimumWidth(35);
+            imageView.setMinimumHeight(35);
             listPass.add(imageView);
             pass.addView(imageView);
         }
         pass.setVisibility(View.VISIBLE);
+    }
+
+    private void initLive(int num){
+        layoutLive.removeAllViews();
+        listLive.clear();
+        for (int i = 0; i < num; i++) {
+            ImageView imageView = new ImageView(this);
+            imageView.setImageResource(R.drawable.live);
+            imageView.setMinimumWidth(35);
+            imageView.setMinimumHeight(35);
+            imageView.setPadding(5,5,5,5);
+            listLive.add(imageView);
+            layoutLive.addView(imageView);
+        }
+
     }
 
     public void glideView(int res, ImageView view) {
